@@ -1,0 +1,11 @@
+# Build folders
+Debug/
+Release/
+
+# Toolchain/IDE specific
+.settings/
+*.launch
+
+# Temporary files
+*.tmp
+*.bak
