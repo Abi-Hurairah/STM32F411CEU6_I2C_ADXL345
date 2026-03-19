@@ -58,43 +58,8 @@ void TimerStart(){
 	// Enable and set clock source to processor clock
 	SysTick -> CTRL |= (1U) | (1U << 2);
 }
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  //LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
-  //LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
-
-  /* System interrupt init*/
-  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-
-  /* SysTick_IRQn interrupt configuration */
-  NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  //SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
+uint8_t I2C_init(void){
   // clock for B port pins
   RCC-> AHB1ENR |= (1U << 1);
   // Enable I2C1 on APB1
@@ -138,7 +103,7 @@ int main(void)
 	  if((SysTick -> CTRL & (1U << 16))){
 		  return 1; //Error: I2C Timeout Occurred
 	  }
-      // Wait until SB is 1
+	  // Wait until SB is 1
   }
 
   // write the address to SDA bus via data register
@@ -152,7 +117,10 @@ int main(void)
 		  return 1; // Error: I2C Timeout Occurred
 	  }
   }
+  return 0;
+}
 
+uint8_t ADXL345_pwr(void){
   // Perform reads on the status registers to reset ADDR bit
   (void)I2C1 -> SR1;
   (void)I2C1 -> SR2;
@@ -178,7 +146,7 @@ int main(void)
 
   // Wait for SB flag
   while(!(I2C1->SR1 & (1U << 0))) {
-      // Wait until SB is 1
+	  // Wait until SB is 1
   }
 
   I2C1 -> DR = (0x53 << 1) | 1U;
@@ -213,7 +181,10 @@ int main(void)
 
   // Set ACK to 1 again to return to original state
   I2C1 -> CR1 |= (1U << 10);
+  return 0;
+}
 
+uint8_t ADXL345_read(){
   // Now we get to powerctl and control the ADXL345
 
   // Start again, since we issued a stop previously
@@ -225,7 +196,7 @@ int main(void)
 	  if((SysTick -> CTRL & (1U << 16))){
 		  return 1; // Error: I2C Timeout Occurred
 	  }
-      // Wait until SB is 1
+	  // Wait until SB is 1
   }
 
   I2C1 -> DR = (0x53 << 1);
@@ -280,7 +251,7 @@ int main(void)
 	  if((SysTick -> CTRL & (1U << 16))){
 		  return 1; // Error: I2C Timeout Occurred
 	  }
-      // Wait until SB is 1
+	  // Wait until SB is 1
   }
 
   // write the address to SDA bus via data register
@@ -322,7 +293,7 @@ int main(void)
 
   // Wait for SB flag
   while(!(I2C1->SR1 & (1U << 0))) {
-      // Wait until SB is 1
+	  // Wait until SB is 1
   }
 
   I2C1 -> DR = (0x53 << 1) | 1U;
@@ -406,11 +377,48 @@ int main(void)
   int16_t y_raw = (int16_t)((data_buffer[3] << 8) | (data_buffer[2]));
   int16_t z_raw = (int16_t)((data_buffer[5] << 8) | (data_buffer[4]));
 
+  return 0;
+}
 
-  // Clean up and upload to github
-  // next step:
-  // - Continously monitor the ADXL345
-  //-  Unit conversion
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  //LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+  //LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+
+  /* System interrupt init*/
+  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+  /* SysTick_IRQn interrupt configuration */
+  NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  //SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+  I2C_init();
+  ADXL345_pwr();
+  ADXL345_read();
 
 
   /* USER CODE END SysInit */
