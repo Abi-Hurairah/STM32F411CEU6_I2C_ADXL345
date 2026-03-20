@@ -49,7 +49,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void TimerStart(){
-	// Set to 1 milisecond
+	// Set to 500 milisecond
 	SysTick->LOAD = 16000 * 500 - 1; // cycles per MS = 16000
 
 	// Reset the clock value
@@ -418,7 +418,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
   I2C_init();
   ADXL345_pwr();
-  ADXL345_read();
+  //ADXL345_read();
 
 
   /* USER CODE END SysInit */
@@ -433,7 +433,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	TimerStart();
+	while(!(SysTick -> CTRL & (1U << 16))){
 
+	}
+	ADXL345_read();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
