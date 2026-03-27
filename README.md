@@ -4,7 +4,7 @@ A register-level implementation of an I2C Master driver for the ADXL345 accelero
 
 ## Technical Specifications
 - **Hardware:** STM32F411CEU6 "Black Pill"
-- **Peripheral:** I2C1 (PB6/PB7)
+- **Peripheral:** I2C1. Uses PB6 (SCL) and PB7 (SDA)
 - **Clock Speed:** 16 MHz HSI (Internal High Speed)
 - **I2C Mode:** Standard Mode (100 kHz)
 - **Timing Calculations:**
@@ -15,7 +15,9 @@ A register-level implementation of an I2C Master driver for the ADXL345 accelero
 - **Zero-Abstraction:** No HAL or LL drivers used for the I2C transaction.
 - **Burst Read:** Synchronized 6-byte read for X, Y, and Z axes to prevent data tearing.
 - **Timeout Logic:** SysTick-based error handling to prevent bus lockup.
-- **Repeated Start:** Efficient pivot from Write to Read mode without releasing the bus.
+- **Modular Driver Design:** Decoupled hardware logic from main.c using a custom adxl345.h/c interface.
+- [PLANNED] **Event-Driven:** CPU is only active when reading bytes.
+- [PLANNED] **DMA:** Sending bytes to DMA controller to achieve higher energy efficiency.
 
 ## Repository Structure
 - `/Core`: Main application logic and register configurations.
