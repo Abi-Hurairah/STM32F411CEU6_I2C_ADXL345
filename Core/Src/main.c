@@ -85,8 +85,6 @@ int main(void)
   NVIC_EnableIRQ(I2C1_EV_IRQn);
   NVIC_EnableIRQ(I2C1_ER_IRQn);
 
-
-
   // Error gets higher priority than events
   NVIC_SetPriority(I2C1_EV_IRQn, 1);
   NVIC_SetPriority(I2C1_ER_IRQn, 0);
@@ -97,10 +95,14 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
   I2C_init();
-  I2C1->CR2 |= (1U << 9);
+
+  // Generate interrupts
+  I2C1->CR2 |= (1U << 9 | 1U << 10);
+
   if (currentState == STATE_IDLE){
 	ADXL345_StartRead();
   }
+
 
   /* USER CODE END SysInit */
 
