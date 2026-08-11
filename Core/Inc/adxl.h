@@ -16,6 +16,7 @@ typedef enum {
 	STATE_REPEATED_READ_ADDR,
 	STATE_RECEIVING,
 	STATE_COMPLETE,
+	STATE_DELAY,
 	STATE_ERROR
 } I2C_State_t;
 
@@ -23,8 +24,6 @@ extern volatile I2C_State_t currentState;
 
 void TimerStart();
 uint8_t I2C_init(void);
-uint8_t ADXL345_pwr(void);
-uint8_t ADXL345_read();
 
 void ADXL345_StartRead();
 

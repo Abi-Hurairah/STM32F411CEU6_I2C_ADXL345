@@ -25,6 +25,7 @@ void I2C1_EV_IRQHandler(void){
 	// read SR1 register to capture snapshot of the hardware
 	uint32_t sr1 = I2C1->SR1;
 
+	// todo: implement error handling
 	switch (currentState) {
 		case STATE_START_SENT:
 			if (sr1 & (1U << 0)){
@@ -124,9 +125,11 @@ void I2C1_EV_IRQHandler(void){
 					x_raw = (int16_t)((data_buffer[1] << 8) | (data_buffer[0]));
 					y_raw = (int16_t)((data_buffer[3] << 8) | (data_buffer[2]));
 					z_raw = (int16_t)((data_buffer[5] << 8) | (data_buffer[4]));
-					currentState = STATE_COMPLETE;
 
-					// todo: implement reading every 0.5 seconds
+
+					// reset counter for next reading
+					count = 0;
+					currentState = STATE_COMPLETE;
 				}
 			}
 			break;
@@ -189,12 +192,4 @@ void ADXL345_StartRead(){
 	// The hardware enters Controller (Master) Mode
 	I2C1 -> CR1 |= (1U << 8);
 	currentState = STATE_START_SENT;
-}
-
-
-
-uint8_t ADXL345_pwr(void){
-}
-
-uint8_t ADXL345_read(){
 }

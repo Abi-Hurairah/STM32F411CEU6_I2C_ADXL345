@@ -115,9 +115,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	if (currentState == STATE_COMPLETE){
+		TimerStart();
 
+		currentState = STATE_DELAY;
+	}
+	else if (currentState == STATE_DELAY && (SysTick -> CTRL & (1U << 16))){
+		ADXL345_StartRead();
+	}
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
