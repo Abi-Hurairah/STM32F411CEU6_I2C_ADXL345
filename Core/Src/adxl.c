@@ -25,7 +25,6 @@ void I2C1_EV_IRQHandler(void){
 	// read SR1 register to capture snapshot of the hardware
 	uint32_t sr1 = I2C1->SR1;
 
-	// todo: implement error handling
 	switch (currentState) {
 		case STATE_START_SENT:
 			if (sr1 & (1U << 0)){
@@ -136,6 +135,24 @@ void I2C1_EV_IRQHandler(void){
 	}
 }
 
+void I2C1_ER_IRQHandler(void){
+	// Release the I2C lines before performing software reset
+	I2C1 -> CR1 |= (1U << 9);
+
+	// Software reset
+	I2C1 -> CR1 |= (1U << 15);
+	I2C1 -> CR1 &= ~(1U << 15);
+
+	// Initialize I2C
+	I2C_init();
+
+	// Re-enable ITEVTEN and ITBUFEN
+	I2C1->CR2 |= (1U << 9) | (1U << 10);
+
+	count = 0;
+	currentState = STATE_IDLE;
+}
+
 void TimerStart(){
 	// Set to 500 miliseconds
 	SysTick->LOAD = 16000 * 500 - 1; // cycles per MS = 16000
@@ -143,8 +160,11 @@ void TimerStart(){
 	// Reset the clock value
 	SysTick-> VAL = 0;
 
+	// Dummy read to clear previous flags
+	(void)SysTick->CTRL;
+
 	// Enable and set clock source to processor clock
-	SysTick -> CTRL |= (1U) | (1U << 2);
+	SysTick -> CTRL = (1U) | (1U << 2);
 }
 
 uint8_t I2C_init(void){
@@ -187,6 +207,7 @@ uint8_t I2C_init(void){
 
 	return 0;
 }
+
 
 void ADXL345_StartRead(){
 	// The hardware enters Controller (Master) Mode

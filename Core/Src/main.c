@@ -99,9 +99,7 @@ int main(void)
   // Generate interrupts
   I2C1->CR2 |= (1U << 9 | 1U << 10);
 
-  if (currentState == STATE_IDLE){
-	ADXL345_StartRead();
-  }
+
 
 
   /* USER CODE END SysInit */
@@ -115,7 +113,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	if (currentState == STATE_COMPLETE){
+
+	if (currentState == STATE_IDLE){
+	  	ADXL345_StartRead();
+
+	  	// set time limit of 500 ms for a single complete read process
+	  	TimerStart();
+  	}
+	else if (currentState != STATE_IDLE && currentState != STATE_COMPLETE && currentState != STATE_DELAY ){
+		if (SysTick -> CTRL & (1U << 16)){
+			// Execute reset if time limit is passed
+			I2C1_ER_IRQHandler();
+		}
+	}
+	else if (currentState == STATE_COMPLETE){
 		TimerStart();
 
 		currentState = STATE_DELAY;
@@ -123,6 +134,7 @@ int main(void)
 	else if (currentState == STATE_DELAY && (SysTick -> CTRL & (1U << 16))){
 		ADXL345_StartRead();
 	}
+
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
 
